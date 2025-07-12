@@ -130,7 +130,7 @@ public class Signup implements ActionListener {
 
         // Store user data in the database
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/letterboxd", "root", "0000");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/letterboxd", "root", "12345");
             String query = "INSERT INTO users (name, email, password, age) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, userName);
@@ -189,7 +189,7 @@ public class Signup implements ActionListener {
     }
 
 
-    public static void main(String[] args) {
-        new Signup();
-    }
+
 }
+
+//Made by ROniiiiiiiiiiiiiii.....
