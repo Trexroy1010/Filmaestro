@@ -23,13 +23,15 @@ public class login extends JFrame implements ActionListener {
     // UI Components
     private JTextField userIDField = new JTextField();
     private JPasswordField userPasswordField = new JPasswordField();
-    private JLabel userIDLabel = new JLabel("User ID: ");
+    private JLabel userIDLabel = new JLabel("User email: ");
     private JLabel userPasswordLabel = new JLabel("Password: ");
     private JLabel messageLabel = new JLabel();
     private JLabel noid = new JLabel("Don't have an account? Sign up now:");
     private JButton loginButton = new JButton("Login");
     private JButton resetButton = new JButton("Reset");
     private JButton signup = new JButton("Signup");
+    private JTextField titleField = new JTextField("FILMAESTRO");
+
 
     public login() {
         setTitle("Filmaestro - Login");
@@ -60,6 +62,15 @@ public class login extends JFrame implements ActionListener {
         };
         backgroundPanel.setBounds(0, 0, 600, 900);
         backgroundPanel.setLayout(null);
+
+        titleField.setBounds(0, 20, 600, 80);
+        titleField.setHorizontalAlignment(JTextField.CENTER);
+        titleField.setFont(new Font("Arial", Font.BOLD, 48));
+        titleField.setForeground(Color.YELLOW);
+        titleField.setBackground(new Color(0,0,0,0)); // Transparent background
+        titleField.setBorder(null);
+        titleField.setEditable(false);
+        titleField.setFocusable(false);
 
         // Style UI Components
         userIDLabel.setBounds(50, 500, 100, 25);
@@ -109,6 +120,7 @@ public class login extends JFrame implements ActionListener {
         backgroundPanel.add(resetButton);
         backgroundPanel.add(noid);
         backgroundPanel.add(signup);
+        backgroundPanel.add(titleField);
 
         // Add panel to frame
         setContentPane(backgroundPanel);
@@ -157,13 +169,18 @@ public class login extends JFrame implements ActionListener {
             String username = userIDField.getText();
             String password = String.valueOf(userPasswordField.getPassword());
 
-            if (authenticate(username, password)) {
+            int userId = getUserId(username, password);
+            if (userId != -1) {
                 messageLabel.setForeground(Color.GREEN);
                 messageLabel.setText("Login successful!");
+
+                Mainpage mainpage = new Mainpage(userId);
+                this.dispose();
             } else {
                 messageLabel.setForeground(Color.RED);
-                messageLabel.setText("Invalid username or password.");
+                messageLabel.setText("Invalid credentials.");
             }
+
         } else if (e.getSource() == resetButton) {
             // Clear fields
             userIDField.setText("");
@@ -174,9 +191,9 @@ public class login extends JFrame implements ActionListener {
     private boolean authenticate(String username, String password) {
         String url = "jdbc:mysql://localhost:3306/letterboxd"; // Database URL
         String user = "root"; // Database username
-        String pass = "0000"; // Database password
+        String pass = "12345"; // Database password
 
-        String query = "SELECT * FROM users WHERE name = ? AND password = ?";
+        String query = "SELECT * FROM users WHERE email = ? AND password = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -193,8 +210,33 @@ public class login extends JFrame implements ActionListener {
             return false;
         }
     }
+    private int getUserId(String username, String password) {
+        String url = "jdbc:mysql://localhost:3306/letterboxd";
+        String dbUser = "root";
+        String dbPass = "0000";
 
-    public static void main(String[] args) {
-        new login();
+        String query = "SELECT id FROM users WHERE email = ? AND password = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("id");
+            } else {
+                return -1; // Invalid login
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
+
+
+
 }
