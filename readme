@@ -1,0 +1,3 @@
+The java files here contains all the code for the "filmastro" application.
+The database is not uploaded.
+The "filmmestro" apk is an windows runable application, but needs java and mysql installed and will not work on anyother devices unless the mysql password is setup as the same in my code, or the code is changed to your computers mysql root password. 
